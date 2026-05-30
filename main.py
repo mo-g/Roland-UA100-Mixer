@@ -1,20 +1,34 @@
 #!/usr/bin/python ua100mix/main.py
 
 """
-ua100mix is just a try for creating a tool to control the Roland/Edirol UA-100,
-an USB Audio & MIDI processing Unit.
+Roland UA-100 Mixer is an incomplete PyQT5 Mixer/DSP Controller for the Roland UA-100 Audio Interface.
+Copyright (C) 2014  Alberto Azzalini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Version 0.7.0
 """
 
 # define authorship information
-__authors__ = ['Alberto "wishmehill" Azzalini']
+__authors__ = ['Alberto "wishmehill" Azzalini', 'Jake, "wrongontheinternet" Owen', 'mo-g']
 __author__ = ','.join(__authors__)
 __credits__ = []
 __copyright__ = 'Copyright (c) 2014'
 __license__ = 'GPL'
 
 # maintanence information
-__maintainer__ = 'Alberto Azzalini'
-__email__ = 'alberto.azzalini@gmail.com'
+__maintainer__ = 'mo-g'
 
 # this is in place of the old DEBUG_MODE (awful!)
 import logging
@@ -27,7 +41,7 @@ formatter = logging.Formatter(
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-logger.info('Starting the ua100mix')
+logger.info('Starting Roland UA-100 Mixer')
 
 # ********************************
 # ***** UA MODE CONTROL **********
@@ -54,8 +68,6 @@ except ImportError:
     REAL_UA_MODE = 0
 import PyQt5.uic
 from PyQt5 import QtWidgets
-# from PyQt4 import QtCore
-# from types import MethodType
 import signal
 import time
 
@@ -408,12 +420,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if (REAL_UA_MODE):
             p = mido.Parser()
-            p.feed([CC_MIC1_CH, CC_MICLINESELECTOR_PAR, self.sender().property('state').toPyObject()])
+            p.feed([CC_MIC1_CH, CC_MICLINESELECTOR_PAR, self.sender().property('state')])
             shortMsg = p.get_message()
             logger.debug('Message to be sent %s', shortMsg)
             pmout.send(shortMsg)
 
-        logger.debug('%s %s %s', CC_MIC1_CH, CC_MICLINESELECTOR_PAR, self.sender().property('state').toPyObject())
+        logger.debug('%s %s %s', CC_MIC1_CH, CC_MICLINESELECTOR_PAR, self.sender().property('state'))
 
     def setEffectMode(self, value):
         '''
@@ -427,6 +439,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def effectSelection(self):
         global MixerEffectMode
+        MixerEffectMode = MIXER_EFFECT_MODE
         if (MixerEffectMode == 0x04):
             if (self.fullEffects):
                 self.fullEffects.close()
@@ -511,7 +524,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             if (REAL_UA_MODE):
                 p = mido.Parser()
-                p.feed([self.sender().parent().property('channel').toPyObject(), CC_SOLO_PAR, 1])
+                p.feed([self.sender().parent().property('channel'), CC_SOLO_PAR, 1])
                 shortMsg = p.get_message()
                 logger.debug('Message to be sent %s', shortMsg)
                 pmout.send(shortMsg)
@@ -521,7 +534,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 if (REAL_UA_MODE):
                     p = mido.Parser()
-                    p.feed([soloingObj.property('channel').toPyObject(), CC_SOLO_PAR, 0])
+                    p.feed([soloingObj.property('channel'), CC_SOLO_PAR, 0])
                     shortMsg = p.get_message()
                     logger.debug('Message to be sent %s', shortMsg)
                     pmout.send(shortMsg)
@@ -543,9 +556,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
             if (REAL_UA_MODE):
                 p = mido.Parser()
-                p.feed([self.sender().parent().property('channel').toPyObject(), CC_SOLO_PAR, 0])
+                p.feed([self.sender().parent().property('channel'), CC_SOLO_PAR, 0])
                 shortMsg = p.get_message()
-                logger.debug('Message to be sent %S', shortMsg)
+                logger.debug('Message to be sent %s', shortMsg)
                 pmout.send(shortMsg)
 
     def resetMixer(self):
@@ -614,7 +627,7 @@ class CompactEffectsInsDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(CompactEffectsInsDialog, self).__init__(parent)
         # here is where I store the channel choosen fo the effect (mic1, mic2, wave1, wave2, sys1, sys2)
-        self.SenderHex = parent.sender().property('HEX').toPyObject()
+        self.SenderHex = parent.sender().property('HEX')
         # load the ui...
         self.ui = PyQt5.uic.loadUi('ui/compacteffectsinsdialog.ui', self)
 
@@ -699,11 +712,11 @@ class CompactEffectsInsDialog(QtWidgets.QDialog):
 
         # first of all convert the passed value to list in order to send the SYSEX message
         valueToList = [value]
-        logger.debug('LSB/MSB for parameter: %s', self.sender().property('HEX').toPyObject())
+        logger.debug('LSB/MSB for parameter: %s', self.sender().property('HEX'))
 
         # if in real mode, actually send the message
         if REAL_UA_MODE == 1:
-            send_DT1([0x00, 0x40] + self.SenderHex + self.sender().property('HEX').toPyObject() + valueToList)
+            send_DT1([0x00, 0x40] + self.SenderHex + self.sender().property('HEX') + valueToList)
 
     def setEffect(self, checked):
         '''
@@ -724,7 +737,7 @@ class CompactEffectsSysDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(CompactEffectsSysDialog, self).__init__(parent)
         # here is where I store the channel choosen fo the effect (mic1, mic2, wave1, wave2, sys1, sys2)
-        self.SenderHex = parent.sender().property('HEX').toPyObject()
+        self.SenderHex = parent.sender().property('HEX')
         # load the ui...
         self.ui = PyQt5.uic.loadUi('ui/compacteffectssysdialog.ui', self)
         if self.SenderHex == [0x05]:
@@ -780,10 +793,10 @@ class CompactEffectsSysDialog(QtWidgets.QDialog):
 
         # first of all convert the passed value to list in order to send the SYSEX message
         valueToList = [value]
-        logger.debug('LSB/MSB for parameter: %s', self.sender().property('HEX').toPyObject())
+        logger.debug('LSB/MSB for parameter: %s', self.sender().property('HEX'))
 
         # if in real mode, actually send the message
-        send_DT1([0x00, 0x40] + self.SenderHex + self.sender().property('HEX').toPyObject() + valueToList)
+        send_DT1([0x00, 0x40] + self.SenderHex + self.sender().property('HEX') + valueToList)
 
 
 class FullEffectsDialog(QtWidgets.QDialog):
@@ -798,7 +811,7 @@ class FullEffectsDialog(QtWidgets.QDialog):
         super(FullEffectsDialog, self).__init__(parent)
 
         # here is where I store the channel choosen fo the effect (mic1, mic2, wave1, wave2, sys1, sys2)
-        self.SenderHex = parent.sender().property('HEX').toPyObject()
+        self.SenderHex = parent.sender().property('HEX')
         # QLineEditStr = 'uiEffectName' + self.sender().text()
         # self.EffectNameTextBox = self.parent().findChild(QtWidgets.QLineEdit, QLineEditStr)
         # load the ui...
@@ -851,10 +864,10 @@ class FullEffectsDialog(QtWidgets.QDialog):
 
         # first of all convert the passed value to list in order to send the SYSEX message
         valueToList = [value]
-        logger.debug('LSB/MSB for parameter: %s', self.sender().property('HEX').toPyObject())
+        logger.debug('LSB/MSB for parameter: %s', self.sender().property('HEX'))
 
         # if in real mode, actually send the message
-        send_DT1([0x00, 0x40] + self.SenderHex + self.sender().property('HEX').toPyObject() + valueToList)
+        send_DT1([0x00, 0x40] + self.SenderHex + self.sender().property('HEX') + valueToList)
 
 
 class CustomTreeItem(QtWidgets.QTreeWidgetItem):

@@ -1,0 +1,20 @@
+[Desktop Entry]
+Comment[en_US]=
+Comment=
+Exec=python3 /home/user/Applications/UA100-Mixer/main.py
+GenericName[en_US]=
+GenericName=
+Icon=/home/user/Applications/UA100-Mixer/roland-logo.png
+MimeType=
+Name[en_US]=Roland UA-100 Mixer
+Name=Roland UA-100 Mixer
+Path=/home/user/Applications/UA100-Mixer
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+Version=v0.7.0
+X-Icon-Path=/home/user/Applications/UA100-Mixer/
+X-KDE-SubstituteUID=false
+X-KDE-Username=
+Categories=Qt;AudioVideo;Audio;Midi;Mixer;Player;Recorder;Sequencer;
