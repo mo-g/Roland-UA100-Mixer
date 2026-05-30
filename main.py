@@ -1,20 +1,34 @@
 #!/usr/bin/python ua100mix/main.py
 
 """
-ua100mix is just a try for creating a tool to control the Roland/Edirol UA-100,
-an USB Audio & MIDI processing Unit.
+Roland UA-100 Mixer is an incomplete PyQT5 Mixer/DSP Controller for the Roland UA-100 Audio Interface.
+Copyright (C) 2014  Alberto Azzalini
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Version 0.7.0
 """
 
 # define authorship information
-__authors__ = ['Alberto "wishmehill" Azzalini']
+__authors__ = ['Alberto "wishmehill" Azzalini', 'Jake, "wrongontheinternet" Owen', 'mo-g']
 __author__ = ','.join(__authors__)
 __credits__ = []
 __copyright__ = 'Copyright (c) 2014'
 __license__ = 'GPL'
 
 # maintanence information
-__maintainer__ = 'Alberto Azzalini'
-__email__ = 'alberto.azzalini@gmail.com'
+__maintainer__ = 'mo-g'
 
 # this is in place of the old DEBUG_MODE (awful!)
 import logging
@@ -27,7 +41,7 @@ formatter = logging.Formatter(
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-logger.info('Starting the ua100mix')
+logger.info('Starting Roland UA-100 Mixer')
 
 # ********************************
 # ***** UA MODE CONTROL **********
@@ -54,8 +68,6 @@ except ImportError:
     REAL_UA_MODE = 0
 import PyQt5.uic
 from PyQt5 import QtWidgets
-# from PyQt4 import QtCore
-# from types import MethodType
 import signal
 import time
 
